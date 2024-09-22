@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Care Hospitals",
+  title: "Best Hospital in Hydrebad | Best Multispeciality Hospitals",
   description: "Your trusted healthcare partner",
 };
 

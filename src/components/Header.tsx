@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, Mic, X } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { create } from "zustand";
 import CareLogo from "../assets/cares-logo.webp";
 import {
@@ -21,6 +21,11 @@ import {
   FaStethoscope,
   FaCalendarAlt,
   FaPhoneAlt,
+  FaFacebookF,
+  FaInstagram,
+  FaYoutube,
+  FaTwitter,
+  FaLinkedinIn,
 } from "react-icons/fa";
 
 interface LanguageStore {
@@ -33,10 +38,79 @@ const useLanguageStore = create<LanguageStore>((set) => ({
   setLanguage: (lang) => set({ language: lang }),
 }));
 
+function SideMenu({ isOpen, onClose }) {
+  const menuItems = ["Home", "About Us", "Blogs", "Careers", "Awards", "Media"];
+
+  const socialIcons = [
+    { Icon: FaFacebookF, href: "#" },
+    { Icon: FaInstagram, href: "#" },
+    { Icon: FaYoutube, href: "#" },
+    { Icon: FaTwitter, href: "#" },
+    { Icon: FaLinkedinIn, href: "#" },
+  ];
+
+  return (
+    <div
+      className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+        isOpen ? "translate-x-0" : "translate-x-full"
+      }`}
+    >
+      <div className="flex justify-end p-4">
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <X className="h-6 w-6" />
+        </button>
+      </div>
+      <nav className="px-4">
+        {menuItems.map((item, index) => (
+          <Link
+            key={index}
+            href="#"
+            className="block py-2 text-lg text-blue-900 hover:text-blue-700 relative group"
+          >
+            {item}
+            <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-700 transition-all duration-300 group-hover:w-full"></span>
+          </Link>
+        ))}
+      </nav>
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-4">
+        {socialIcons.map(({ Icon, href }, index) => (
+          <a
+            key={index}
+            href={href}
+            className="text-gray-600 hover:text-blue-700"
+          >
+            <Icon className="h-6 w-6" />
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Hover-triggered dropdown component
+const Dropdown = ({ title, children }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <button className="text-gray-700 font-semibold">{title}</button>
+      {isHovered && (
+        <div className="absolute left-0 mt-1 w-48 bg-white shadow-lg rounded-lg">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function Header() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false); // Track scroll state
+  const [isScrolled, setIsScrolled] = useState(false);
   const { language, setLanguage } = useLanguageStore();
 
   const topNavItems = [
@@ -49,25 +123,83 @@ export default function Header() {
   ];
 
   const navItems = [
-    { icon: <FaUserMd />, text: "Doctors", href: "#" },
-    { icon: <FaStethoscope />, text: "Specialities & Treatments", href: "#" },
-    { icon: <FaHospital />, text: "Hospitals & Directions", href: "#" },
-    { icon: <FaCalendarAlt />, text: "Book an Appointment", href: "#" },
-    { icon: <FaPhoneAlt />, text: "Contact Us", href: "#" },
+    {
+      icon: <FaUserMd />,
+      text: "Doctors",
+      href: "#",
+    },
+    {
+      icon: <FaStethoscope />,
+      text: (
+        <Dropdown title="Specialities & Treatments">
+          <ul>
+            <li>
+              <Link href="/cardiology">Cardiology</Link>
+            </li>
+            <li>
+              <Link href="/neurology">Neurology</Link>
+            </li>
+            <li>
+              <Link href="/orthopedics">Orthopedics</Link>
+            </li>
+          </ul>
+        </Dropdown>
+      ),
+      href: "#",
+    },
+    {
+      icon: <FaHospital />,
+      text: (
+        <Dropdown title="Hospitals & Directions">
+          <ul>
+            <li>
+              <Link href="/hospital-1">Hospital 1</Link>
+            </li>
+            <li>
+              <Link href="/hospital-2">Hospital 2</Link>
+            </li>
+            <li>
+              <Link href="/hospital-3">Hospital 3</Link>
+            </li>
+          </ul>
+        </Dropdown>
+      ),
+      href: "#",
+    },
+    {
+      icon: <FaCalendarAlt />,
+      text: (
+        <Dropdown title="Book an Appointment">
+          <ul>
+            <li>
+              <Link href="/appointment-1">Doctor Appointment</Link>
+            </li>
+            <li>
+              <Link href="/appointment-2">Specialist Appointment</Link>
+            </li>
+          </ul>
+        </Dropdown>
+      ),
+      href: "#",
+    },
+    {
+      icon: <FaPhoneAlt />,
+      text: "Contact Us",
+      href: "#",
+    },
   ];
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
   };
 
-  // Effect to detect scroll and update `isScrolled` state
+  const toggleSideMenu = () => {
+    setIsSideMenuOpen(!isSideMenuOpen);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true); // Hide the teal part after scrolling
-      } else {
-        setIsScrolled(false); // Show the teal part when near the top
-      }
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -79,23 +211,24 @@ export default function Header() {
   return (
     <header className="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
       {!isScrolled && (
-        <div className="bg-teal-500 text-white transition-all duration-300">
+        <div className="bg-[#00b3b3] text-white transition-all duration-300">
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between py-2">
-              <nav className="hidden lg:flex space-x-4">
+            <div className="flex items-center justify-end py-1">
+              <nav className="hidden lg:flex space-x-4 gap-nav">
                 {topNavItems.map((item, index) => (
                   <Link
                     key={index}
                     href="#"
-                    className="text-sm hover:text-gray-200"
+                    className="text-xs hover:text-gray-200 relative group"
                   >
                     {item}
+                    <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-white transition-all group-hover:w-full"></span>
                   </Link>
                 ))}
               </nav>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 ml-4">
                 <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger className="w-[120px] bg-white text-teal-500 border-none">
+                  <SelectTrigger className="w-[100px] h-7 bg-white text-[#00b3b3] border-none text-xs">
                     <SelectValue placeholder="English" />
                   </SelectTrigger>
                   <SelectContent>
@@ -105,7 +238,7 @@ export default function Header() {
                   </SelectContent>
                 </Select>
                 <Select>
-                  <SelectTrigger className="w-[120px] bg-white text-teal-500 border-none">
+                  <SelectTrigger className="w-[100px] h-7 bg-white text-[#00b3b3] border-none text-xs">
                     <SelectValue placeholder="Hospitals" />
                   </SelectTrigger>
                   <SelectContent>
@@ -117,18 +250,18 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-white hover:text-gray-200"
+                  className="text-white hover:text-gray-200 h-7 w-7"
                   onClick={toggleSearch}
                 >
-                  <Search className="h-5 w-5" />
+                  <Search className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="lg:hidden text-white hover:text-gray-200"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="text-white hover:text-gray-200 h-7 w-7"
+                  onClick={toggleSideMenu}
                 >
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -148,13 +281,6 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-12 top-1/2 transform -translate-y-1/2"
-              >
-                <Mic className="h-5 w-5 text-gray-500" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
                 className="absolute right-2 top-1/2 transform -translate-y-1/2"
                 onClick={toggleSearch}
               >
@@ -165,61 +291,35 @@ export default function Header() {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-2">
-        {" "}
-        {/* Reduced py-4 to py-2 */}
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto px-4 py-2 bg-[#F3F4F6]">
+        <div className="flex items-center justify-between h-[50px]">
           <Image
             src={CareLogo}
             alt="Care Hospitals Logo"
-            width={100}
-            height={33}
-            className="ml-4"
+            width={70}
+            height={10}
+            className="ml-4 margin-left-care"
           />
-          <nav className="hidden lg:flex space-x-6">
-            {" "}
-            {/* Reduced space-x-8 to space-x-6 */}
+          <nav className="hidden lg:flex space-x-6 relative items-center gap-8 mr-3">
             {navItems.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                className="flex items-center space-x-1 text-gray-700 hover:text-gray-900"
-              >
-                <span className="text-xl">{item.icon}</span>{" "}
-                {/* Reduced from text-2xl */}
-                <span className="font-semibold text-sm">{item.text}</span>{" "}
-                {/* Added text-sm */}
-              </Link>
+              <div key={index} className="group relative">
+                <Link
+                  href={item.href}
+                  className="flex items-center space-x-1 text-gray-700 hover:text-gray-900"
+                >
+                  <span className="text-xl">{item.icon}</span>
+                  <span className="font-semibold text-sm">{item.text}</span>
+                </Link>
+              </div>
             ))}
           </nav>
         </div>
       </div>
 
-      {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white p-4">
-          <nav className="flex flex-col space-y-2">
-            {topNavItems.map((item, index) => (
-              <Link
-                key={index}
-                href="#"
-                className="text-sm text-gray-600 hover:text-gray-900"
-              >
-                {item}
-              </Link>
-            ))}
-            {navItems.map((item, index) => (
-              <Link
-                key={index}
-                href="#"
-                className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
-              >
-                <span>{item.icon}</span>
-                <span>{item.text}</span>
-              </Link>
-            ))}
-          </nav>
-        </div>
-      )}
+      <SideMenu
+        isOpen={isSideMenuOpen}
+        onClose={() => setIsSideMenuOpen(false)}
+      />
     </header>
   );
 }
