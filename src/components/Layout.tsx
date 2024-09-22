@@ -2,6 +2,7 @@ import Header from "./Header";
 import Banner from "./Banner";
 import MainContent from "./MainContent";
 import FloatingButtons from "./FloatingButtons";
+import CareSection from "./WhyCareHospitals";
 
 export default function Layout() {
   return (
@@ -10,6 +11,7 @@ export default function Layout() {
       <main>
         <Banner />
         <MainContent />
+        <CareSection />
       </main>
       <FloatingButtons />
     </div>
